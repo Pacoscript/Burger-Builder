@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 
-import Auxy from '../../hoc/Auxy'
+import Auxy from '../../hoc/Auxy/Auxy'
 import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
 import Modal from '../../components/UI/Modal/Modal'
@@ -72,6 +72,10 @@ class BurgerBuilder extends Component {
         this.setState ({purchasing: false})
     }
 
+    purchaseContinueHandler = () => {
+        alert ('You continue!')
+    }
+
     render () {
         const disabledInfo = {...this.state.ingredients}
         for (let key in disabledInfo) {
@@ -80,7 +84,12 @@ class BurgerBuilder extends Component {
         return (
             <Auxy>
                 <Modal show={this.state.purchasing} modalClosed = {this.purchaseCancelHandler}>
-                    <OrderSummary ingredients = {this.state.ingredients} />
+                    <OrderSummary 
+                        ingredients = {this.state.ingredients}
+                        prize = {this.state.totalPrize}
+                        purchaseCancelled = {this.purchaseCancelHandler}
+                        purchaseContinued = {this.purchaseContinueHandler}
+                        />
                 </Modal>
                 <Burger ingredients = {this.state.ingredients} />
                 <BuildControls
