@@ -5,7 +5,7 @@ import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
 import Modal from '../../components/UI/Modal/Modal'
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
-import withErrorHandler from '../../hoc/WhitErrorHandler/WhitErrorHandler'
+import withErrorHandler from '../../hoc/WhitErrorHandler/whitErrorHandler'
 import axios from '../../axios-orders'
 import Spinner from '../../components/UI/Spinner/Spinner'
 
@@ -18,16 +18,22 @@ const INGREDIENT_PRIZES = {
 
 class BurgerBuilder extends Component {
     state = {
-        ingredients : {
-            salad: 0,
-            cheese: 0,
-            meat: 0,
-            bacon: 0
-        },
+        ingredients : null,
         totalPrize : 4,
         purchasable: false,
         purchasing: false,
-        loading: false
+        loading: false,
+        error: false
+    }
+
+    componentDidMount () {
+        axios.get('https://react-my-burger-paco.firebaseio.com/ingredients.json')
+            .then(response => {
+                this.setState({ingredients: response.data})
+            })
+            .catch(error => {
+                this.setState({error:true})
+            })
     }
 
     updatePurchaseState (ingredients) {
@@ -94,7 +100,7 @@ class BurgerBuilder extends Component {
 
             }
         }
-        axios.post('/orders', order)
+        axios.post('/orders.json', order)
             .then(response => {
                 this.setState ({loading: false, purchasing: false})
             })
@@ -108,28 +114,36 @@ class BurgerBuilder extends Component {
         for (let key in disabledInfo) {
             disabledInfo[key] = disabledInfo[key]<=0
         }
-        let orderSummary = <OrderSummary 
-            ingredients = {this.state.ingredients}
-            prize = {this.state.totalPrize}
-            purchaseCancelled = {this.purchaseCancelHandler}
-            purchaseContinued = {this.purchaseContinueHandler} />
+        let orderSummary = null
+
+        let burger = this.state.error ? <p>Ingredients cant be displayed</p> : <Spinner />
+        if (this.state.ingredients){
+            burger = (
+                <Auxy>
+                    <Burger ingredients = {this.state.ingredients} />
+                        <BuildControls
+                            totalPrize = {this.state.totalPrize}
+                            ingredientAdded = {this.addIngredientHandler}
+                            ingredientRemoved = {this.removeIngredientHandler}
+                            purchasable = {this.state.purchasable}
+                            ordered = {this.purchaseHandler}
+                            disabled = {disabledInfo} />
+                </Auxy>)
+                orderSummary = <OrderSummary 
+                    ingredients = {this.state.ingredients}
+                    prize = {this.state.totalPrize}
+                    purchaseCancelled = {this.purchaseCancelHandler}
+                    purchaseContinued = {this.purchaseContinueHandler} />
+        }
         if (this.state.loading){
             orderSummary = <Spinner />
-
         }
         return (
             <Auxy>
                 <Modal show={this.state.purchasing} modalClosed = {this.purchaseCancelHandler}>
                     {orderSummary}
                 </Modal>
-                <Burger ingredients = {this.state.ingredients} />
-                <BuildControls
-                    totalPrize = {this.state.totalPrize}
-                    ingredientAdded = {this.addIngredientHandler}
-                    ingredientRemoved = {this.removeIngredientHandler}
-                    purchasable = {this.state.purchasable}
-                    ordered = {this.purchaseHandler}
-                    disabled = {disabledInfo} />
+                {burger}
             </Auxy>
         )
     }
