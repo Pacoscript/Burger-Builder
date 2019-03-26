@@ -5,7 +5,7 @@ import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
 import Modal from '../../components/UI/Modal/Modal'
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
-import withErrorHandler from '../../hoc/WhitErrorHandler/WhitErrorHandler'
+import withErrorHandler from '../../hoc/WhitErrorHandler/whitErrorHandler'
 import axios from '../../axios-orders'
 import Spinner from '../../components/UI/Spinner/Spinner'
 
@@ -107,7 +107,15 @@ class BurgerBuilder extends Component {
         //     .catch(error => {
         //         this.setState ({loading: false,  purchasing: false})
         //     })
-        this.props.history.push('./checkout')
+        const queryParams = []
+        for (let i in this.state.ingredients){
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]))
+        }
+        const queryString = queryParams.join('&')
+        this.props.history.push({
+            pathname: './checkout',
+            search: '?' + queryString
+        })
     }
 
     render () {
