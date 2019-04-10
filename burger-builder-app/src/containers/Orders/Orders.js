@@ -4,7 +4,7 @@ import Order from '../../components/Order/Order'
 
 import axios from '../../axios-orders'
 
-import withErrorHandler from '../../hoc/WhitErrorHandler/whitErrorHandler'
+import withErrorHandler from '../../hoc/WithErrorHandler/WithErrorHandler'
 
 class Orders extends Component {
 
