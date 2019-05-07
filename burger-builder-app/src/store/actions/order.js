@@ -24,14 +24,20 @@ export const purchaseBurgerStart = () => {
 
 export const purchaseBurger = orderData => {
   return dispatch => {
-    dispatch(purchaseBurgerStart())
+    dispatch(purchaseBurgerStart());
     axios
       .post('/orders.json', orderData)
       .then(response => {
-        dispatch(purchaseBurgerSucces(response.data, orderData));
+        dispatch(purchaseBurgerSucces(response.data.name, orderData));
       })
       .catch(error => {
         dispatch(purchaseBurgerFail(error));
       });
+  };
+};
+
+export const purchaseInit = () => {
+  return {
+    type: actionTypes.PURCHASE_INIT
   };
 };
